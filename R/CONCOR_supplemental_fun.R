@@ -45,9 +45,9 @@ concor_igraph_apply <- function(igraph_list, nsplit = 1) {
   return(igraph_out)
 }
 
-concor_plot <- function(iobject, nsplit = NULL) {
+concor_plot <- function(iobject, nsplit = NULL, vertex.label = NA, vertex.size = 5, edge.arrow.size = .3) {
   split_name <- paste0("csplit", nsplit)
   igraph::plot.igraph(iobject, vertex.color = igraph::vertex.attributes(iobject)[[split_name]],
-                      vertex.label = NA, vertex.size = 5, edge.arrow.size = .3)
+                      vertex.label = vertex.label, vertex.size = vertex.size, edge.arrow.size = edge.arrow.size)
 }
 
