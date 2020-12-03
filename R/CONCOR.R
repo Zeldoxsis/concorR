@@ -154,7 +154,9 @@ concor1 <- function(m_stack, cutoff = .9999999, max_iter = 50) {
     for (i in 1:s_number) {
       for (j in 1:l_vect[i+1]) {
         for(k in 1:length(bool_list[[i]][[1]])) {
-          booleans_out[[sum(l_vect[1:i])+j]][sum(l_internal[1:i])+k] <- bool_list[[i]][[j]][k]
+          a <- sum(l_vect[1:i])+j
+          b <- sum(l_internal[1:i])+k
+          booleans_out[[a]][b] <- bool_list[[i]][[j]][k]
         }
       }
     }
@@ -171,12 +173,13 @@ concor1 <- function(m_stack, cutoff = .9999999, max_iter = 50) {
 }
 
 .block_names <- function(mat_list) {
-  lapply(seq_along(mat_list), function(x) data.frame(block = x,
-                                                     vertex = colnames(mat_list[[x]]),
-                                                     stringsAsFactors = FALSE))
+  lapply(seq_along(mat_list),
+         function(x) data.frame(block = x, vertex = colnames(mat_list[[x]]),
+                                stringsAsFactors = FALSE))
 }
 
-concor <- function(m_list, nsplit = 1, self_ties = FALSE, cutoff = .9999999, max_iter = 50) {
+concor <- function(m_list, nsplit = 1, self_ties = FALSE, cutoff = .9999999,
+                   max_iter = 50) {
   m_list <- .concor_validitycheck(m_list)
   mi <- m_list
   if (all(sapply(mi, function(x) all(is.na(diag(x)))))) {
@@ -219,7 +222,8 @@ concor <- function(m_list, nsplit = 1, self_ties = FALSE, cutoff = .9999999, max
     stack_list <- stack_list[is_empty]
 
     if (identical(stop_check, stack_list)) {
-      warning(paste("split", nsplit, "was the same as split",  i - 1, "\n stopping"))
+      warning(paste("split", nsplit,
+                    "was the same as split",  i - 1, "\n stopping"))
       break
     }
 

@@ -13,7 +13,8 @@ concor_make_igraph <- function(adj_list, nsplit = 1) {
   adj_list <- .concor_validitycheck(adj_list)
   concor_out <- suppressWarnings(concor(adj_list, nsplit))
 
-  igraph_list <- lapply(adj_list, function(x) igraph::graph_from_adjacency_matrix(x))
+  igraph_list <- lapply(adj_list,
+                        function(x) igraph::graph_from_adjacency_matrix(x))
   v <- paste("csplit", nsplit, sep = "")
   igraph_out <- lapply(igraph_list, function(x) .blk_apply(x, concor_out, v))
 
@@ -31,12 +32,15 @@ concor_make_igraph <- function(adj_list, nsplit = 1) {
 }
 
 concor_igraph_apply <- function(igraph_list, nsplit = 1) {
-  b <- sapply(igraph_list, function(x) is.null(vertex.attributes(x)$name))
+  b <- sapply(igraph_list,
+              function(x) is.null(vertex.attributes(x)$name))
   if (all(b)) {
     warning("node names don't exist\nAdding default node names\n")
     igraph_list <- lapply(igraph_list, .name_igraph)
   }
-  adj_list <- lapply(igraph_list, function(x) igraph::get.adjacency(x, sparse = FALSE))
+
+  adj_list <- lapply(igraph_list,
+                     function(x) igraph::get.adjacency(x, sparse = FALSE))
 
   concor_out <- suppressWarnings(concor(adj_list, nsplit))
   v <- paste("csplit", nsplit, sep = "")
@@ -45,9 +49,14 @@ concor_igraph_apply <- function(igraph_list, nsplit = 1) {
   return(igraph_out)
 }
 
-concor_plot <- function(iobject, nsplit = NULL, vertex.label = NA, vertex.size = 5, edge.arrow.size = .3) {
+
+plot_socio <- function(iobject, nsplit = NULL, vertex.label = NA,
+                       vertex.size = 5, edge.arrow.size = .3) {
   split_name <- paste0("csplit", nsplit)
-  igraph::plot.igraph(iobject, vertex.color = igraph::vertex.attributes(iobject)[[split_name]],
-                      vertex.label = vertex.label, vertex.size = vertex.size, edge.arrow.size = edge.arrow.size)
+  vcolors <- igraph::vertex.attributes(iobject)[[split_name]]
+  igraph::plot.igraph(iobject, vertex.color = vcolors,
+                      vertex.label = vertex.label,
+                      vertex.size = vertex.size,
+                      edge.arrow.size = edge.arrow.size)
 }
 

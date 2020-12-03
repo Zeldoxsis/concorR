@@ -6,7 +6,9 @@ make_blk <- function(adj_list, nsplit = 1) {
   concor_order <- match(colnames(adj_list[[1]]), concor_out$vertex)
   block_ordered <- concor_out$block[concor_order]
 
-  blockmodel_list <- lapply(adj_list, function(x) sna::blockmodel(as.matrix(x), block_ordered))
+  blockmodel_list <- lapply(adj_list,
+                            function(x) sna::blockmodel(as.matrix(x),
+                                                        block_ordered))
 
   return(blockmodel_list)
 }
@@ -43,7 +45,8 @@ plot_blk <- function (x, labels = FALSE, ...) {
   #edited version of the function from the SNA package, plots as square
   #and slightly changed labeling
 
-  #Carter T. Butts (2019). sna: Tools for Social Network Analysis. R package version 2.5.
+  #Carter T. Butts (2019). sna: Tools for Social Network Analysis.
+  #R package version 2.5.
   #https://CRAN.R-project.org/package=sna
 
   if (!labels) {
@@ -51,40 +54,42 @@ plot_blk <- function (x, labels = FALSE, ...) {
     x$glabels <- ""
   }
 
-  oldpar <- par(no.readonly = TRUE)
-  on.exit(par(oldpar))
+  oldpar <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(oldpar))
   n <- dim(x$blocked.data)[2]
   m <- sna::stackcount(x$blocked.data)
   if (!is.null(x$plabels))
     plab <- x$plabels
   else plab <- (1:n)[x$order.vector]
   glab <- ""
-  par(mfrow = c(floor(sqrt(m)), ceiling(m/floor(sqrt(m)))))
+  graphics::par(mfrow = c(floor(sqrt(m)), ceiling(m/floor(sqrt(m)))))
   if (m > 1)
     for (i in 1:m) {
       sna::plot.sociomatrix(x$blocked.data[i, , ], labels = list(plab, plab),
                        main = glab[i], drawlines = FALSE, asp = 1)
 
       for (j in 2:n) if (x$block.membership[j] != x$block.membership[j - 1])
-        abline(v = j - 0.5, h = j - 0.5, lty = 3)
+        graphics::abline(v = j - 0.5, h = j - 0.5, lty = 3)
     }
   else {
     sna::plot.sociomatrix(x$blocked.data, labels = list(plab, plab),
                      main = glab[1], drawlines = FALSE, asp = 1)
 
     for (j in 2:n) if (x$block.membership[j] != x$block.membership[j - 1])
-      abline(v = j - 0.5, h = j - 0.5, lty = 3)
+      graphics::abline(v = j - 0.5, h = j - 0.5, lty = 3)
   }
 }
 
 make_reduced_igraph <- function(reduced_mat) {
-  iplotty <- igraph::graph_from_adjacency_matrix(reduced_mat, mode = "directed")
+  iplotty <- igraph::graph_from_adjacency_matrix(reduced_mat,
+                                                 mode = "directed")
   return(iplotty)
 }
 
 
-plot_red <- function(blk) {
-  igraph::plot.igraph(blk, vertex.color = c(1:length(igraph::vertex.attributes(blk)[[1]])), vertex.label = NA,
-       edge.arrow.size = .6, vertex.size = 25)
+plot_reduced <- function(iobject) {
+  vcolors <- c(1:length(igraph::vertex_attr(iobject)$name))
+  igraph::plot.igraph(iobject, vertex.color = vcolors, vertex.label = NA,
+                      edge.arrow.size = .6, vertex.size = 25)
 }
 
