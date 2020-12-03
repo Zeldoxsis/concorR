@@ -20,7 +20,21 @@ concor_make_igraph <- function(adj_list, nsplit = 1) {
   return(igraph_out)
 }
 
+.name_igraph <- function(iobject) {
+  lvec <- 1:length(V(iobject))
+  n_zero <- floor(log10(l))+1
+  num_list <- formatC(lvec, width = n_zero, format = "d", flag = "0")
+  v <- paste0("V", num_list)
+  vertex.attributes(iobject)$name <- v
+  return(iobject)
+}
+
 concor_igraph_apply <- function(igraph_list, nsplit = 1) {
+  b <- sapply(igraph_list, function(x) is.null(vertex.attributes(x)$name))
+  if (all(b)) {
+    warning("node names don't exist\nAdding default node names\n")
+    igraph_list <- lapply(igraph_list, .name_igraph)
+  }
   adj_list <- lapply(igraph_list, function(x) igraph::get.adjacency(x, sparse = FALSE))
 
   concor_out <- suppressWarnings(concor(adj_list, nsplit))
