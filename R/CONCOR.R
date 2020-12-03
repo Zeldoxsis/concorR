@@ -22,9 +22,11 @@ concor1 <- function(m_stack, cutoff = .9999999, max_iter = 50) {
 
 .name <- function(mat) {
   a <- 1:nrow(mat)
-  vnames <- sprintf("v%03d", a)
-  colnames(mat) <- vnames
-  rownames(mat) <- vnames
+  n_zero <- floor(log10(nrow(mat)))+1
+  num_list <- formatC(a, width = n_zero, format = "d", flag = "0")
+  v <- paste0("V", num_list)
+  colnames(mat) <- v
+  rownames(mat) <- v
   return(mat)
 }
 
