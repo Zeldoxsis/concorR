@@ -29,6 +29,9 @@ concor1 <- function(m_stack, cutoff = .9999999, max_iter = 50) {
 }
 
 .concor_validitycheck <- function(m_list) {
+  if (any(unlist(lapply(m_list, function(x) is(x)))=="dgCMatrix")) {
+    m_list <- lapply(m_list, function(x) as.matrix(x))
+  }
   a <- m_list[[1]]
   for (i in 1:length(m_list)) {
     if (length(a) != length(m_list[[i]])) {
@@ -99,23 +102,59 @@ concor1 <- function(m_stack, cutoff = .9999999, max_iter = 50) {
 }
 
 .make_sub_boolean <- function(cor_matrixies_orderd) {
-  group <- cor_matrixies_orderd[, 1] > 0
-  return(group)
+  input <- cor_matrixies_orderd[,1]
+  a <- any(is.na(input))
+  b <- any(input[!is.na(input)] > 0)
+  c <- any(input[!is.na(input)] < 0)
+  out <- list()
+  if(a){
+    if(b&&c){
+      in1 <- in2 <-input
+      in1[is.na(in1)] <- -1
+      in2[is.na(in2)] <- 1
+
+      out[[1]] <- is.na(input)
+      out[[2]] <- in1 > 0
+      out[[3]] <- in2 < 0
+
+    }
+    else{
+      out[[1]] <- is.na(input)
+      out[[2]] <- !is.na(input)
+    }
+  }
+  else{
+    out[[1]] <- input > 0
+    out[[2]] <- input < 0
+  }
+  return(out)
 }
 
 .make_big_booleans <- function(bool_list) {
   if (!is.list(bool_list)) {
     stop("not a list")
   }
-  bool_num <- length(bool_list)
-  tot_length <- length(unlist(bool_list))
-  booleans_out <- rep(list(vector("logical", tot_length)), 2 * bool_num)
-  a <- 1
-  for (i in 1:bool_num) {
-    for(j in 1:length(bool_list[[i]])) {
-      booleans_out[[2*i-1]][a] <- bool_list[[i]][j]
-      booleans_out[[2*i]][a] <- !bool_list[[i]][j]
-      a <- a + 1
+  if (length(bool_list)==1) {
+    booleans_out <- unlist(bool_list, recursive = FALSE)
+  }
+  else{
+    bool_num <- length(unlist(bool_list, recursive = FALSE))
+    tot_length <- sum(sapply(bool_list, function(x) length(x[[1]])))
+    l_vect <- sapply(bool_list, function(x) length(x))
+    l_internal <- sapply(bool_list, function(x) length(x[[1]]))
+    s_number <- length(bool_list)
+
+    booleans_out <- rep(list(vector("logical", tot_length)), bool_num)
+
+    l_internal <- c(0,l_internal)
+    l_vect <- c(0,l_vect)
+
+    for (i in 1:s_number) {
+      for (j in 1:l_vect[i+1]) {
+        for(k in 1:length(bool_list[[i]][[1]])) {
+          booleans_out[[sum(l_vect[1:i])+j]][sum(l_internal[1:i])+k] <- bool_list[[i]][[j]][k]
+        }
+      }
     }
   }
   return(booleans_out)
