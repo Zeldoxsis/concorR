@@ -10,6 +10,7 @@
 }
 
 concor_make_igraph <- function(adj_list, nsplit = 1) {
+  adj_list <- .concor_validitycheck(adj_list)
   concor_out <- suppressWarnings(concor(adj_list, nsplit))
 
   igraph_list <- lapply(adj_list, function(x) igraph::graph_from_adjacency_matrix(x))
