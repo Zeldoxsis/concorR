@@ -21,7 +21,8 @@ concor_make_igraph <- function(adj_list, nsplit = 1) {
 }
 
 .name_igraph <- function(iobject) {
-  lvec <- 1:length(V(iobject))
+  l <- length(V(iobject))
+  lvec <- 1:l
   n_zero <- floor(log10(l))+1
   num_list <- formatC(lvec, width = n_zero, format = "d", flag = "0")
   v <- paste0("V", num_list)
